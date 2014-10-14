@@ -1,0 +1,83 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Salt</title>
+
+<script type="text/javascript" src="{{ static_url("jquery.js") }}"></script>
+<script type="text/javascript">
+$(function(){
+	//$("#resultmassage").hide();
+
+	$("#functions").change(function() {
+		var functions = $.trim($("#functions").val());
+		if(functions == "test.ping"){
+			//影藏cmd框
+                        $("#cmd").val("");
+			$("#cmd").hide();
+		}else if(functions == "cmd.run"){
+			//显示cmd框
+			$("#cmd").show();
+		}else{
+		alert("Function选择有误");
+		}
+	});
+        $("#format").change(function() {
+                        $("#target").val("");
+                        $("#cmd").val("");
+        });
+	
+	$("#submit").click(function() {
+		var format = $.trim($("#format").val());
+		var target = $.trim($("#target").val());
+		var functions = $.trim($("#functions").val());
+		var cmd = $.trim($("#cmd").val());
+		if(target == ""){
+			alert("Target不能为空！");
+		}else if((functions == 'cmd.run') && (cmd == '')){
+			alert("请输入执行命令！");
+		}else{
+		
+			$.ajax({
+				type: "POST",
+				url: "runsalt",
+				data: {format:format,target:target,functions:functions,cmd:cmd},
+				dataType : "json",
+				success: function(result){
+						//alert(result.result);
+						$("#resultmassage").show();
+						$("#massage").val(result.result);
+				},
+				error : function(){
+					alert("system error");
+				}
+			});
+			
+		}
+	});
+
+});
+</script>
+</head>
+<body>
+	<div align="center" >
+	Target Format:
+				<select id="format" height=40 >
+					<option>List</option>
+					<option>NodeGroup</option>
+					<option>Grain</option>
+				</select>
+	Target:<input type="text" id="target" />
+	Function:
+			<select id="functions" height=40>
+				<option>cmd.run</option>
+				<option>test.ping</option>
+			</select>
+	<input type="text" id="cmd" />
+	<input type="button" value="执行" id="submit" />
+	</div>
+	<br>
+	<div align="center" id="resultmassage">
+		<textarea id="massage" style="width:800px;height:200px" readonly="readonly"></textarea>
+	</div>
+</body>
+</html>
